@@ -6,7 +6,8 @@ This repo has 2 demos for HashiCorp Vault, using minikube cluster as clients.
 
 ### Requirements
 
-*This demo environment was setup in MacOSX*
+*This demo environment was setup in MacOSX.*
+*You will need to know bash to debug if something goes wrong*
 
 * Minikube
 * Helm
