@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webapp
+  name: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0-rc1_ent
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-myapp: secret/myapp/config
+        vault.hashicorp.com/agent-inject-secret-.terraformrc: secret/myapp/tf_config
+        vault.hashicorp.com/secret-volume-path-.terraformrc: /root/
+        vault.hashicorp.com/agent-inject-template-.terraformrc: |
+          {{- with secret "secret/myapp/tf_config" -}}
+          credentials "{{ .Data.tf_server }}" {
+            token = "{{ .Data.tf_token }}"
+          }
+          {{- end -}}
+        vault.hashicorp.com/role: example
+        vault.hashicorp.com/namespace: cluster-1
+        vault.hashicorp.com/client-timeout: 5s
+        vault.hashicorp.com/client-max-retries: "2"
+      labels:
+        app: webapp
+    spec:
+      serviceAccountName: webapp
+      containers:
+      - image: webapp:v1
+        name: webapp
+        imagePullPolicy: Never
+        resources: {}
+        ports:
+          - containerPort: 5000
+        env:
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MY_POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.serviceAccountName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: webapp
+  name: webapp
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+  selector:
+    app: webapp
+  sessionAffinity: None

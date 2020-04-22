@@ -1,0 +1,94 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: "2020-04-21T16:44:36Z"
+  labels:
+    app.kubernetes.io/component: jenkins-master
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-1.16.1
+  managedFields:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:labels:
+          .: {}
+          f:app.kubernetes.io/component: {}
+          f:app.kubernetes.io/instance: {}
+          f:app.kubernetes.io/managed-by: {}
+          f:app.kubernetes.io/name: {}
+          f:helm.sh/chart: {}
+      f:rules: {}
+    manager: Go-http-client
+    operation: Update
+    time: "2020-04-21T16:44:36Z"
+  name: demo-jenkins-schedule-agents
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/exec
+  - pods/log
+  - persistentvolumeclaims
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/exec
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: "2020-04-21T16:44:36Z"
+  labels:
+    app.kubernetes.io/component: jenkins-master
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-1.16.1
+  managedFields:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:labels:
+          .: {}
+          f:app.kubernetes.io/component: {}
+          f:app.kubernetes.io/instance: {}
+          f:app.kubernetes.io/managed-by: {}
+          f:app.kubernetes.io/name: {}
+          f:helm.sh/chart: {}
+      f:roleRef:
+        f:apiGroup: {}
+        f:kind: {}
+        f:name: {}
+      f:subjects: {}
+    manager: Go-http-client
+    operation: Update
+    time: "2020-04-21T16:44:36Z"
+  name: demo-jenkins-schedule-agents
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: demo-jenkins-schedule-agents
+subjects:
+- kind: ServiceAccount
+  name: demo-jenkins
+  namespace: default
