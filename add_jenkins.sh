@@ -2,8 +2,12 @@ source helper.sh
 
 ##### Install jenkins
 c1_kctx
-## pre-req namespace
+## pre-req for Jenkins
 kubectl create namespace workers || true
+
+### adding image
+eval $(minikube docker-env -p cluster-1)
+docker build --rm builder -t builder:v0
 
 ## jenkins installation
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
@@ -50,6 +54,10 @@ EOF
     tee aws-policy-ro.hcl <<EOF
 # For AWS secrets engine
 path "$1/creds/ro-role" {
+    capabilities = ["read"]
+}
+
+path "auth/token/lookup-self" {
     capabilities = ["read"]
 }
 EOF

@@ -531,6 +531,31 @@ agent:
             args: "cat"
             ttyEnabled: true
             privileged: true
+    aws-dev: |
+      - name: aws-dev
+        label: aws-dev
+        namespace: worker-aws-dev
+        serviceAccount: aws-dev
+        annotations:
+          - key: vault.hashicorp.com/agent-inject
+            value: true
+          - key: vault.hashicorp.com/role
+            value: aws-dev
+          - key: vault.hashicorp.com/namespace
+            value: cluster-1
+          - key: vault.hashicorp.com/agent-inject-secret-credentials
+            value: aws-dev/creds/ro-role
+          - key: vault.hashicorp.com/agent-inject-token
+            value: true
+          - key: vault.hashicorp.com/secret-volume-path
+            value: /root
+        containers:
+          - name: builder
+            image: builder:v0
+            command: "/bin/sh -c"
+            args: "cat"
+            ttyEnabled: true
+            privileged: true
     aws-test: |
       - name: aws-test
         label: aws-test
