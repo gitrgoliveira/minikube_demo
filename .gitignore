@@ -1,2 +1,3 @@
 keys.txt
-pipeline {.groovy
+vault.volume/file/
+vault.volume/logs

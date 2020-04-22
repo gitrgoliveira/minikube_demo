@@ -6,6 +6,9 @@ CL1IP=$(minikube ip -p cluster-1)
 minikube start --cpus=2 -p cluster-2
 CL2IP=$(minikube ip -p cluster-2)
 
+mkdir -p ./vault.volume/file
+mkdir -p ./vault.volume/logs
+
 docker-compose up -d
 sleep 2
 vault operator init -status > /dev/null
