@@ -27,7 +27,7 @@ The objective with this demo is to demonstrate how to isolate the access to Vaul
 
 The above image illustrates three use cases:
 1. The happy path: an application running on `ns1` k8s namespace is able to authenticate to `cluster-1` Vault namespace and retrieve a *KV* secret.
-   * *The Vault Namespace isolation ensures the authentication backend is not able to povide access to the `cluster-2` secrets, because the token provided is scoped to `cluster-1` namespace.*
+   * *Vault Namespace isolation ensures the authentication backend is not able to povide access to the `cluster-2` secrets, because the token provided is scoped to `cluster-1` namespace.*
 
 2. Fail path 1: An application running on `ns2` k8s namespace  tries to authenticate to `cluster-1` Vault namespace, but fails, because the namespace `ns2` is not authorized.
 
@@ -49,6 +49,7 @@ To achieve this we have set the following targets:
  * Reduce the value of the auth credential used to access Vault, in case of a leak.
  * Reduce the secret sprawl, by removing secrets from the Jenkins credential store.
  * Isolate the pipeline code used as much as possible.
+ * Use a credential to access Vault that can be rotated.
 
 ![Jenkins workflow](/graphics/jenkins-k8s-auth.svg)
 
