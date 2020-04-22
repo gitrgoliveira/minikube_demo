@@ -10,7 +10,7 @@ mkdir -p ./vault.volume/file
 mkdir -p ./vault.volume/logs
 
 docker-compose up -d
-sleep 2
+sleep 5
 vault operator init -status > /dev/null
 if [ $? -eq 2 ]; then
 vault operator init > keys.txt
@@ -29,4 +29,3 @@ fi
 # login
 vault login $(grep -h 'Initial Root Token' keys.txt | awk '{print $NF}') > /dev/null
 vault audit enable file file_path=/vault/logs/$(date "+%Y%m%d%H%M.%S").log.json
-# vault write /sys/license text=$(cat ~/Documents/vault_v2lic.hclic)
