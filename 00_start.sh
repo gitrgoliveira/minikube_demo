@@ -10,7 +10,11 @@ mkdir -p ./vault.volume/file
 mkdir -p ./vault.volume/logs
 
 docker-compose up -d
-sleep 5
+
+while ! nc -z localhost 8200; do
+  sleep 5
+done
+
 vault operator init -status > /dev/null
 if [ $? -eq 2 ]; then
 vault operator init > keys.txt
