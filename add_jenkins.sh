@@ -11,7 +11,7 @@ docker build --rm builder -t builder:v0
 
 ## jenkins installation
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
-helm install demo stable/jenkins -f ./jenkins_values.yaml
+helm install demo stable/jenkins -f ./jenkins_values.yaml --version 1.17.2
 
 function setup_k8s_ns_aws_account (){
     ###### Setting up k8s workers namespace
