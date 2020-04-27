@@ -9,7 +9,6 @@ from flask_session import Session
 
 
 def hello_world():
-    vault_path = 'secret/myapp/config'
     storage_path = '/vault/secrets/myapp'
     data = ""
     tf_file = ""
@@ -23,27 +22,25 @@ def hello_world():
     except:
         data = "no secret available"
 
-    output = "node {node}</br>\
+    output = "Kubernetes node {node}</br>\
             </br>\
+            Kubernetes namespace {namespace}</br>\
             </br>\
-            Running on namespace {namespace}</br>\
+            Kubernetes ServiceAccount \"{svcacc}\" authorised to access Vault </br>\
             </br>\
-            Using service account \"{svcacc}\" to access vault </br>\
+            Displaying secrets read from FILE in {storage_path} </br>\
             </br>\
-            reading {vault_path} from {storage_path} </br>\
+            Values in Vault path \"secret/myapp/config\"></br>\
+            {data}</br>\
             </br>\
-            Value:</br>\
-            {value}</br>\
-            </br>\
-            </br>\
-            Terraform configuration:</br>\
+            Rendered template from Vault path \"secret/myapp/tf_config\":</br>\
             {tf_file}</br>\
+            </br>\
             </br>\
             ".format( node=os.environ.get('MY_NODE_NAME'),
                 namespace=os.environ.get('MY_POD_NAMESPACE'),
                 svcacc=os.environ.get('MY_POD_SERVICE_ACCOUNT'),
-                value=data,
-                vault_path=vault_path,
+                data=data,
                 storage_path=storage_path,
                 tf_file=tf_file)
 

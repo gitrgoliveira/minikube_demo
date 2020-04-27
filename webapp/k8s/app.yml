@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0-rc1_ent
+        vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-secret-myapp: secret/myapp/config
         vault.hashicorp.com/agent-inject-secret-.terraformrc: secret/myapp/tf_config
@@ -26,8 +26,6 @@ spec:
           {{- end -}}
         vault.hashicorp.com/role: example
         vault.hashicorp.com/namespace: cluster-1
-        vault.hashicorp.com/client-timeout: 5s
-        vault.hashicorp.com/client-max-retries: "2"
       labels:
         app: webapp
     spec:
@@ -65,4 +63,3 @@ spec:
   - port: 5000
   selector:
     app: webapp
-  sessionAffinity: None
