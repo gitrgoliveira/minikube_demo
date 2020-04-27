@@ -14,6 +14,10 @@ path "aws/creds/my-role" {
     capabilities = ["read"]
 }
 
+# allowing client to read their own token
+path "auth/token/lookup-self" {
+    capabilities = ["read"]
+}
 EOF
 
 function setup_k8s (){
