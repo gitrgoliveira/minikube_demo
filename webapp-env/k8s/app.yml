@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webapp-env
+  name: webapp-env
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp-env
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/secret-volume-path-token: /root/
+        vault.hashicorp.com/role: env-example
+        vault.hashicorp.com/namespace: cluster-1
+      labels:
+        app: webapp-env
+    spec:
+      serviceAccountName: webapp
+      containers:
+      - image: webapp-env:v1
+        name: webapp-env
+        imagePullPolicy: Never
+        resources: {}
+        ports:
+          - containerPort: 5000
+        env:
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MY_POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.serviceAccountName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: webapp-env
+  name: webapp-env
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+  selector:
+    app: webapp-env
