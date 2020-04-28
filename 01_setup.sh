@@ -17,12 +17,15 @@ path "aws/creds/my-role" {
 EOF
 
 function setup_k8s (){
+    # Creating Vault namespace
     vault namespace create $1
 
     kubectl config use-context $1
+    # Service Account for Vault access to the k8s API
+    kubectl create serviceaccount vault-auth
+    # Service account for applications
     kubectl create serviceaccount webapp -n ns1
     kubectl create serviceaccount webapp -n ns2
-    kubectl create serviceaccount vault-auth
 
     kubectl apply -f vault-auth-service-account.yml
 
