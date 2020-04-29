@@ -3,3 +3,4 @@ vault.volume/file/
 vault.volume/logs
 vault/
 manifests/
+secrets-store-csi-driver/
