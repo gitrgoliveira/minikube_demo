@@ -8,7 +8,7 @@ source helper.sh
 vault write -namespace=cluster-1 auth/kubernetes/role/env-example \
         bound_service_account_names=webapp \
         bound_service_account_namespaces=ns1 \
-        policies=myapp-kv-ro ttl=30m
+        policies=myapp-kv-ro token_num_uses=0 token_ttl=10s token_max_ttl=72h
 
 ## build
 eval $(minikube docker-env -p cluster-1)

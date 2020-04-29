@@ -6,6 +6,8 @@ RUN pip install --upgrade pip;\
 RUN curl -o envconsul.zip https://releases.hashicorp.com/envconsul/0.9.2/envconsul_0.9.2_linux_amd64.zip ; yes | unzip envconsul.zip; mv envconsul /usr/local/bin/
 COPY . /app
 
+# hardcoded Vault Namespace required for EnvConsul
+ENV VAULT_NAMESPACE=cluster-1
 ENTRYPOINT [ "/usr/local/bin/envconsul", "-log-level=debug", \
     "-config=/app/config/envconsul.hcl", "-upcase", "-sanitize", \
     "-secret", "secret/myapp/config", \

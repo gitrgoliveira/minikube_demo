@@ -30,7 +30,7 @@ def hello_world():
             {data}</br>\
             </br>\
             </br>\
-            ".format( node=os.environ.get('MY_NODE_NAME'),
+            ".format(node=os.environ.get('MY_NODE_NAME'),
                 namespace=os.environ.get('MY_POD_NAMESPACE'),
                 svcacc=os.environ.get('MY_POD_SERVICE_ACCOUNT'),
                 data=data,

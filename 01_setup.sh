@@ -1,6 +1,6 @@
 source helper.sh
 
-tee myapp-kv-ro.hcl <<EOF
+tee myapp-kv-ro.hcl > /dev/null <<EOF
 # For K/V v1 secrets engine
 path "secret/myapp/*" {
     capabilities = ["read", "list"]
