@@ -75,7 +75,8 @@ rm myapp-kv-ro.hcl
 rm -rf manifests
 mkdir -p manifests
 
-helm fetch --untar  https://github.com/hashicorp/vault-helm/archive/v0.5.0.tar.gz
+VAULT_HELM_VERSION=v0.5.0
+helm fetch --untar  https://github.com/hashicorp/vault-helm/archive/$VAULT_HELM_VERSION.tar.gz
 helm template --set injector.externalVaultAddr=http://$(ipconfig getifaddr en0):8200/ \
     --set fullnameOverride=vault \
     --set injector.logLevel=debug \
@@ -83,6 +84,8 @@ helm template --set injector.externalVaultAddr=http://$(ipconfig getifaddr en0):
 
 c1_kctl apply -f manifests/vault/templates
 c2_kctl apply -f manifests/vault/templates
+
+rm -rf $VAULT_HELM_VERSION.tar.gz
 
 c1_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
 c2_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
