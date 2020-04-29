@@ -11,8 +11,9 @@ mkdir -p ./vault.volume/logs
 
 docker-compose up -d
 
-while ! nc -z localhost 8200; do
-  sleep 5
+while ! curl http://127.0.0.1:8200/sys/health -s --show-error; do
+  echo "Waiting for Vault to be ready"
+  sleep 2
 done
 
 vault operator init -status > /dev/null
