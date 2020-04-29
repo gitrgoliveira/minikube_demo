@@ -34,7 +34,7 @@ The above image illustrates three use cases:
 3. Fail path 2: An application running on `ns1` k8s namespace  tries to authenticate to `cluster-1` Vault Namespace, but fails, because the cluster is not the one configured in Vault Kubernetes auth backend.
 
 ### Setup steps
-1. Run `00_start.sh` (may need to be run twice)
+1. Run `00_start.sh`
 2. Run `01_setup.sh`
 3. Run `02_deploy.sh`
 
@@ -58,7 +58,7 @@ To achieve this, we have set the following targets:
 
 
 ### Setup steps
-1. Run `00_start.sh` (may need to be run twice)
+1. Run `00_start.sh`
 2. Run `01_setup.sh`
 3. Run `add_jenkins.sh`
 
