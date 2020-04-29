@@ -2,7 +2,7 @@ version: '3.6'
 services:
   vault: # https://hub.docker.com/r/hashicorp/vault-enterprise/tags
     container_name: vault.server
-    image: hashicorp/vault-enterprise:1.4.0-rc1_ent
+    image: hashicorp/vault-enterprise:1.4.0_ent
     environment:
       - VAULT_DEV_ROOT_TOKEN_ID=root
 
