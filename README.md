@@ -86,10 +86,16 @@ Sometimes it's difficult to adapt an application do read variables from a file, 
 
 The advantage here is that the changes are minimum, but it's also a *one-shot* injection, with no refresh ability.
 
-**Option two** same as above, but the script also reacts to file changes.
-
+**Option two** same as above, but the script also watches for file changes and restarts the process.
 
 **Option three** is to use `envconsul`, to keep track of changes in Vault and restart the `webapp` process accordingly.
+
+This last option requires many changes, for example:
+ * Vault namespace specified in Dockerfile
+ * Vault secrets path specified in Dockerfile
+ * envconsul becomes a dependency
+ * Management of envconsul.hcl configuration file
+ * Vault token TTL needs to be increased, since envconsul will not refresh the token from the file.
 
 ### Setup steps
 1. Run `00_start.sh`
