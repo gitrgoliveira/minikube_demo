@@ -1,8 +1,19 @@
-# Minikube demos
+# Minikube Vault demos
 
-This repo has 2 demos for HashiCorp Vault, using minikube cluster as clients.
+This repo has some demos for HashiCorp Vault, using minikube clusters as clients.
 
 *Note: This is an advanced topic using a time limited public image of Vault Enterprise.*
+
+- [Minikube Vault demos](#minikube-vault-demos)
+    - [Requirements](#requirements)
+  - [Kubernetes auth](#kubernetes-auth)
+    - [Overview](#overview)
+    - [Setup steps](#setup-steps)
+  - [Jenkins workflow](#jenkins-workflow)
+    - [Overview](#overview-1)
+    - [Setup steps](#setup-steps-1)
+  - [Envconsul workflow](#envconsul-workflow)
+    - [Setup steps](#setup-steps-2)
 
 ### Requirements
 
@@ -65,3 +76,22 @@ To achieve this, we have set the following targets:
 To work with this setup you can `source helper.sh`, which provides you with some helper commands and setup.
 
 To clear your machine, just run `03_teardown.sh`
+
+
+## Envconsul workflow
+
+Sometimes it's difficult to adapt an application do read variables from a file, instead of using environment variables. For these use cases, there are a few options:
+
+**Option one** is to have Vault agent inject a variable file in the right format and modify the docker entry point to wrap binary into `export $(cat envfile | xargs) && webapp`
+
+The advantage here is that the changes are minimum, but it's also a *one-shot* injection, with no refresh ability.
+
+**Option two** same as above, but the script also reacts to file changes.
+
+
+**Option three** is to use `envconsul`, to keep track of changes in Vault and restart the `webapp` process accordingly.
+
+### Setup steps
+1. Run `00_start.sh`
+2. Run `01_setup.sh`
+3. Run `add_webapp-env.sh`
