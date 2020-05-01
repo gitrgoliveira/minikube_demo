@@ -3,36 +3,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: webapp
-  name: webapp
+    app: webapp-template
+  name: webapp-template
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webapp
+      app: webapp-template
   template:
     metadata:
       annotations:
         vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-secret-myapp: secret/myapp/config
-        vault.hashicorp.com/agent-inject-secret-.terraformrc: secret/myapp/tf_config
-        vault.hashicorp.com/secret-volume-path-.terraformrc: /root/
-        vault.hashicorp.com/agent-inject-template-.terraformrc: |
-          {{- with secret "secret/myapp/tf_config" -}}
-          credentials "{{ .Data.tf_server }}" {
-            token = "{{ .Data.tf_token }}"
-          }
-          {{- end -}}
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/secret-volume-path-token: /root/
         vault.hashicorp.com/role: example
         vault.hashicorp.com/namespace: cluster-1
       labels:
-        app: webapp
+        app: webapp-template
     spec:
       serviceAccountName: webapp
       containers:
-      - image: webapp:v1
-        name: webapp
+      - image: webapp-template:v1
+        name: webapp-template
         imagePullPolicy: Never
         resources: {}
         ports:
@@ -55,11 +48,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: webapp
-  name: webapp
+    app: webapp-template
+  name: webapp-template
 spec:
   type: NodePort
   ports:
   - port: 5000
   selector:
-    app: webapp
+    app: webapp-template

@@ -2,47 +2,30 @@ import os
 import logging
 import random
 import string
+import json
 
 from flask import Flask, session
 from flask.logging import default_handler
 from flask_session import Session
+from json2html import json2html
+
 
 
 def hello_world():
-    storage_path = '/vault/secrets/myapp'
-    data = ""
-    tf_file = ""
-    try:
-        with open(storage_path) as fp:
-            for line in fp:
-                data = data + "%s</br>" % (line)
-        with open("/root/.terraformrc") as fp:
-            for line in fp:
-                tf_file = tf_file + "%s</br>" % (line)
-    except:
-        data = "no secret available"
-
+    env_json = json.dumps(dict(os.environ), ensure_ascii=False, sort_keys=True)
     output = "Kubernetes node {node}</br>\
             </br>\
             Kubernetes namespace {namespace}</br>\
             </br>\
             Kubernetes ServiceAccount \"{svcacc}\" authorised to access Vault </br>\
             </br>\
-            Displaying secrets read from FILE in {storage_path} </br>\
-            </br>\
-            Values in Vault path \"secret/myapp/config\"></br>\
-            {data}</br>\
-            </br>\
-            Rendered template from Vault path \"secret/myapp/tf_config\":</br>\
-            {tf_file}</br>\
-            </br>\
+            Values injected into the environment, using envconsul:</br>\
+            {env}</br>\
             </br>\
             ".format( node=os.environ.get('MY_NODE_NAME'),
                 namespace=os.environ.get('MY_POD_NAMESPACE'),
                 svcacc=os.environ.get('MY_POD_SERVICE_ACCOUNT'),
-                data=data,
-                storage_path=storage_path,
-                tf_file=tf_file)
+                env=json2html.convert(json=env_json))
 
     return output
 
