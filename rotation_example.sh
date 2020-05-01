@@ -1,6 +1,8 @@
 source helper.sh
 
 c1_kctx
+
+## when the JWT token is deleted, k8s re-creates another one.
 kubectl delete secret $(kubectl get secrets | grep "vault-auth-token" | awk '{print $1}')
 
 VAULT_SA_NAME=$(kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}")
