@@ -16,7 +16,8 @@ spec:
         vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-token: "true"
-        vault.hashicorp.com/secret-volume-path-token: /root/
+        # writing token to a known path to be picked up by envconsul
+        vault.hashicorp.com/secret-volume-path-token: /root
         vault.hashicorp.com/role: env-example
         vault.hashicorp.com/namespace: cluster-1
       labels:
@@ -27,7 +28,6 @@ spec:
       - image: webapp-env:v1
         name: webapp-env
         imagePullPolicy: Never
-        resources: {}
         ports:
           - containerPort: 5000
         env:
@@ -43,6 +43,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.serviceAccountName
+
 ---
 apiVersion: v1
 kind: Service
