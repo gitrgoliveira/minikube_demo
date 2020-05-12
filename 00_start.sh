@@ -11,7 +11,7 @@ mkdir -p ./vault.volume/logs
 
 docker-compose up -d
 
-while ! curl $VAULT_ADDR -s --show-error; do
+while ! curl $VAULT_ADDR/sys/health -s --show-error; do
   echo "Waiting for Vault to be ready"
   sleep 2
 done
