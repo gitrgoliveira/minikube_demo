@@ -75,20 +75,23 @@ rm myapp-kv-ro.hcl
 #############################################
 # Apply
 #############################################
-rm -rf manifests
-mkdir -p manifests
 
-VAULT_HELM_VERSION=v0.5.0
-helm fetch --untar  https://github.com/hashicorp/vault-helm/archive/$VAULT_HELM_VERSION.tar.gz
-helm template --set injector.externalVaultAddr=http://$(ipconfig getifaddr en0):8200/ \
+
+VAULT_HELM_VERSION=0.5.0
+helm repo add hashicorp https://helm.releases.hashicorp.com
+
+c1_kctx
+helm install vault hashicorp/vault --version $VAULT_HELM_VERSION \
+    --set injector.externalVaultAddr=$VAULT_ADDR \
     --set fullnameOverride=vault \
     --set injector.logLevel=debug \
-    ./vault/ --output-dir ./manifests
 
-c1_kctl apply -f manifests/vault/templates
-c2_kctl apply -f manifests/vault/templates
+c2_kctx
+helm install vault hashicorp/vault --version $VAULT_HELM_VERSION \
+    --set injector.externalVaultAddr=$VAULT_ADDR \
+    --set fullnameOverride=vault \
+    --set injector.logLevel=debug \
 
-rm -rf $VAULT_HELM_VERSION.tar.gz
 
 c1_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
 c2_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector

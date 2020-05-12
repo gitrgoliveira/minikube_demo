@@ -6,6 +6,3 @@ minikube delete -p cluster-2
 docker-compose down
 rm -rvf vault.volume/file/*
 rm -fv vault.volume/logs/*
-rm -rvf v0.*
-rm -rvf master
-rm -rvf vault
