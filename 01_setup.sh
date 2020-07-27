@@ -77,7 +77,7 @@ rm myapp-kv-ro.hcl
 #############################################
 
 
-VAULT_HELM_VERSION=0.5.0
+VAULT_HELM_VERSION=0.6.0
 helm repo add hashicorp https://helm.releases.hashicorp.com
 
 c1_kctx
