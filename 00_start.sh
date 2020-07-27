@@ -1,9 +1,9 @@
 source helper.sh
 
-minikube start --cpus=4 -p cluster-1
+minikube start --cpus=4 -p cluster-1 --vm=true --driver=hyperkit
 CL1IP=$(minikube ip -p cluster-1)
 
-minikube start --cpus=2 -p cluster-2
+minikube start --cpus=2 -p cluster-2 --vm=true --driver=hyperkit
 CL2IP=$(minikube ip -p cluster-2)
 
 mkdir -p ./vault.volume/file
@@ -34,3 +34,6 @@ fi
 # login
 vault login $(grep -h 'Initial Root Token' keys.txt | awk '{print $NF}') > /dev/null
 vault audit enable file file_path=/vault/logs/$(date "+%Y%m%d%H%M.%S").log.json
+
+# license
+# vault write /sys/license text=$(cat /Users/rgoliveira/Documents/vault_v2lic.hclic)
