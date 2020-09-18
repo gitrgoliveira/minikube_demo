@@ -10,8 +10,11 @@ eval $(minikube docker-env -p cluster-1)
 docker build --rm builder -t builder:v0
 
 ## jenkins installation
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
-helm install demo stable/jenkins -f ./jenkins_values.yaml --version 1.17.2
+# helm repo add stable https://kubernetes-charts.storage.googleapis.com
+# helm install demo stable/jenkins -f ./jenkins_values.yaml --version 1.17.2
+helm repo add jenkinsci https://charts.jenkins.io
+helm repo update
+helm install demo jenkinsci/jenkins -f ./jenkins_values.yaml --version 2.6.4
 
 function setup_k8s_ns_aws_account (){
     ###### Setting up k8s workers namespace
