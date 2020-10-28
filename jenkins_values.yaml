@@ -26,7 +26,7 @@ master:
     - workflow-job:2.39
     - workflow-aggregator:2.6
     - credentials-binding:1.23
-    - credentials:2.3.7
+    - credentials:2.3.11
     - git:4.2.2
     - configuration-as-code:1.41
 
@@ -50,7 +50,7 @@ master:
         <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.80">
           <script>
           pipeline {
-              agent { label 'aws-test' }
+              agent { label 'test-agent' }
               stages {
                   stage('first_stage') {
                       steps {
@@ -105,20 +105,18 @@ agent:
             args: "cat"
             ttyEnabled: true
             privileged: true
-    aws-dev: |
-      - name: aws-dev
-        label: aws-dev
-        namespace: worker-aws-dev
-        serviceAccount: aws-dev
+    dev-agent: |
+      - name: dev-agent
+        label: dev-agent
+        namespace: worker-dev
+        serviceAccount: dev
         annotations:
           - key: vault.hashicorp.com/agent-inject
             value: true
           - key: vault.hashicorp.com/role
-            value: aws-dev
+            value: dev
           - key: vault.hashicorp.com/namespace
             value: cluster-1
-          - key: vault.hashicorp.com/agent-inject-secret-credentials
-            value: aws-dev/creds/ro-role
           - key: vault.hashicorp.com/agent-inject-token
             value: true
           - key: vault.hashicorp.com/secret-volume-path
@@ -130,20 +128,18 @@ agent:
             args: "cat"
             ttyEnabled: true
             privileged: true
-    aws-test: |
-      - name: aws-test
-        label: aws-test
-        namespace: worker-aws-test
-        serviceAccount: aws-test
+    test-agent: |
+      - name: test-agent
+        label: test-agent
+        namespace: worker-test
+        serviceAccount: test
         annotations:
           - key: vault.hashicorp.com/agent-inject
             value: true
           - key: vault.hashicorp.com/role
-            value: aws-test
+            value: test
           - key: vault.hashicorp.com/namespace
             value: cluster-1
-          - key: vault.hashicorp.com/agent-inject-secret-credentials
-            value: aws-test/creds/ro-role
           - key: vault.hashicorp.com/agent-inject-token
             value: true
           - key: vault.hashicorp.com/secret-volume-path
@@ -155,20 +151,18 @@ agent:
             args: "cat"
             ttyEnabled: true
             privileged: true
-    aws-prod: |
-      - name: aws-prod
-        label: aws-prod
-        namespace: worker-aws-prod
-        serviceAccount: aws-prod
+    prod-agent: |
+      - name: prod-agent
+        label: prod-agent
+        namespace: worker-prod
+        serviceAccount: prod
         annotations:
           - key: vault.hashicorp.com/agent-inject
             value: true
           - key: vault.hashicorp.com/role
-            value: aws-prod
+            value: prod
           - key: vault.hashicorp.com/namespace
             value: cluster-1
-          - key: vault.hashicorp.com/agent-inject-secret-credentials
-            value: aws-prod/creds/ro-role
           - key: vault.hashicorp.com/agent-inject-token
             value: true
           - key: vault.hashicorp.com/secret-volume-path
