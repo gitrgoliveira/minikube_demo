@@ -16,14 +16,6 @@ spec:
         vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-secret-myapp: secret/myapp/config
-        vault.hashicorp.com/agent-inject-secret-.terraformrc: secret/myapp/tf_config
-        vault.hashicorp.com/secret-volume-path-.terraformrc: /root/
-        vault.hashicorp.com/agent-inject-template-.terraformrc: |
-          {{- with secret "secret/myapp/tf_config" -}}
-          credentials "{{ .Data.tf_server }}" {
-            token = "{{ .Data.tf_token }}"
-          }
-          {{- end -}}
         vault.hashicorp.com/role: example
         vault.hashicorp.com/namespace: cluster-1
       labels:
@@ -31,9 +23,9 @@ spec:
     spec:
       serviceAccountName: webapp
       containers:
-      - image: webapp:v1
+      - image: ghcr.io/gitrgoliveira/minikube_demo/webapp:v1
         name: webapp
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         resources: {}
         ports:
           - containerPort: 5000

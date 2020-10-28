@@ -26,7 +26,7 @@ spec:
       containers:
       - image: webapp-template:v1
         name: webapp-template
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         resources: {}
         ports:
           - containerPort: 5000

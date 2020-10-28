@@ -27,7 +27,7 @@ spec:
       containers:
       - image: webapp-env:v1
         name: webapp-env
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 5000
         env:
