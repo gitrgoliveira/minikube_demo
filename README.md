@@ -23,7 +23,7 @@ This repo has some demos for HashiCorp Vault, using minikube clusters as clients
 * docker and docker-compose
 * kubectl
 * Vault cli
-* Vault Enterprise license
+* Vault Enterprise license in `./vault.volume/config/license.hclic`
 
 
 ## Kubernetes auth
