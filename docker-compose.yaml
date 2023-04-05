@@ -2,9 +2,10 @@ version: '3.6'
 services:
   vault: # https://hub.docker.com/r/hashicorp/vault-enterprise/tags
     container_name: vault.server
-    image: hashicorp/vault-enterprise:1.5.3_ent
+    image: hashicorp/vault-enterprise:1.13-ent
     environment:
       - VAULT_DEV_ROOT_TOKEN_ID=root
+      - VAULT_LICENSE_PATH=/vault/config/license.hclic
     ports:
       - "8200:8200"
     volumes:
