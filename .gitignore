@@ -4,3 +4,5 @@ vault.volume/logs
 vault/
 manifests/
 secrets-store-csi-driver/
+*.hclic
+.DS_Store
