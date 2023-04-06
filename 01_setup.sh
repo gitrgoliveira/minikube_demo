@@ -1,5 +1,21 @@
 source helper.sh
 
+#############################################
+#   Installing external Vault
+#############################################
+
+VAULT_HELM_VERSION=0.23.0
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update
+
+c1_kctx
+helm install vault hashicorp/vault --version $VAULT_HELM_VERSION \
+    --set "injector.externalVaultAddr=$VAULT_ADDR" \
+    --set injector.logLevel=debug
+
+kubectl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
+
+
 tee myapp-kv-ro.hcl > /dev/null <<EOF
 # For K/V v1 secrets engine
 path "secret/myapp/*" {
@@ -25,13 +41,12 @@ function setup_k8s (){
     vault namespace create $1
 
     kubectl config use-context $1
-    # Service Account for Vault access to the k8s API
-    kubectl create serviceaccount vault-auth
+    
     # Service account for applications
     kubectl create serviceaccount webapp -n ns1
     kubectl create serviceaccount webapp -n ns2
 
-    kubectl apply -f vault-auth-service-account.yml
+    # kubectl apply -f vault-auth-service-account.yml
 
     vault policy write -namespace=$1 myapp-kv-ro myapp-kv-ro.hcl
 
@@ -39,20 +54,29 @@ function setup_k8s (){
     vault kv put -namespace=$1 secret/myapp/config username='appuser' password='suP3rsec(et!' ttl='2s' cluster=$1
     vault kv put -namespace=$1 secret/myapp/tf_config ttl='2s' tf_server='app.terraform.io' tf_token='example.swasdfs14UyfU0CJQ.atlasv2.AAbddAffk1236yJsGDz0PvrM'
 
-    VAULT_SA_NAME=$(kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}")
     # Set SA_JWT_TOKEN value to the service account JWT used to access the TokenReview API
-    SA_JWT_TOKEN=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data.token}" | base64 --decode; echo)
-    # Set SA_CA_CRT to the PEM encoded CA cert used to talk to Kubernetes API
-    SA_CA_CRT=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo)
-
-    # Set K8S_HOST to minikube IP address
-    K8S_HOST=$(minikube ip -p $1)
+    kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-token
+  annotations:
+    kubernetes.io/service-account.name: vault
+type: kubernetes.io/service-account-token
+EOF
+    
     vault auth enable -namespace=$1 kubernetes
 
+    TOKEN_REVIEW_JWT=$(kubectl get secret vault-token --output='go-template={{ .data.token }}' | base64 --decode)
+    # TOKEN_REVIEW_JWT=$(kubectl create token vault --duration=120h)
+    KUBE_HOST=$(kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}')
+    KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode)
+
     vault write -namespace=$1 auth/kubernetes/config \
-        token_reviewer_jwt="$SA_JWT_TOKEN" \
-        kubernetes_host="https://$K8S_HOST:8443" \
-        kubernetes_ca_cert="$SA_CA_CRT"
+        token_reviewer_jwt="$TOKEN_REVIEW_JWT" \
+        kubernetes_host="$KUBE_HOST" \
+        kubernetes_ca_cert="$KUBE_CA_CERT"  \
+        issuer="https://kubernetes.default.svc.cluster.local"
 
     # Create a role named, 'example' to map Kubernetes Service Account to
     # Vault policies and default token TTL
@@ -60,38 +84,20 @@ function setup_k8s (){
     vault write -namespace=$1 auth/kubernetes/role/example \
         bound_service_account_names=webapp \
         bound_service_account_namespaces=ns1 \
+        alias_name_source=serviceaccount_name \
         policies=myapp-kv-ro ttl=5s
 }
 
 c1_kctl create ns ns1
 c1_kctl create ns ns2
-c2_kctl create ns ns1
-c2_kctl create ns ns2
 
 setup_k8s "cluster-1"
-setup_k8s "cluster-2"
 
 rm myapp-kv-ro.hcl
 #############################################
-# Apply
-#############################################
 
-
-VAULT_HELM_VERSION=0.6.0
-helm repo add hashicorp https://helm.releases.hashicorp.com
-
-c1_kctx
-helm install vault hashicorp/vault --version $VAULT_HELM_VERSION \
-    --set injector.externalVaultAddr=$VAULT_ADDR \
-    --set fullnameOverride=vault \
-    --set injector.logLevel=debug \
-
-c2_kctx
-helm install vault hashicorp/vault --version $VAULT_HELM_VERSION \
-    --set injector.externalVaultAddr=$VAULT_ADDR \
-    --set fullnameOverride=vault \
-    --set injector.logLevel=debug \
-
-
-c1_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
-c2_kctl wait --for=condition=available --timeout=20s deployment/vault-agent-injector
+# curl -ki \
+#     --request POST \
+#     --data '{"jwt": "$SA_JWT_TOKEN", "role": "vault"}' \
+#     https://127.0.0.1:58347/v1/auth/kubernetes/login
+#     https://127.0.0.1:58347/apis/authentication.k8s.io/v1/tokenreviews

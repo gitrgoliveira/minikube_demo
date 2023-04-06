@@ -13,7 +13,6 @@ spec:
   template:
     metadata:
       annotations:
-        vault.hashicorp.com/agent-image: hashicorp/vault-enterprise:1.4.0_ent
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-token: "true"
         # writing token to a known path to be picked up by envconsul

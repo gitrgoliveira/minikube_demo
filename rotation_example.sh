@@ -1,20 +1,26 @@
 source helper.sh
 
 c1_kctx
-
-## when the JWT token is deleted, k8s re-creates another one.
-kubectl delete secret $(kubectl get secrets | grep "vault-auth-token" | awk '{print $1}')
-
-VAULT_SA_NAME=$(kubectl get sa vault-auth -o jsonpath="{.secrets[*]['name']}")
-# Set SA_JWT_TOKEN value to the service account JWT used to access the TokenReview API
-SA_JWT_TOKEN=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data.token}" | base64 --decode; echo)
-# Set SA_CA_CRT to the PEM encoded CA cert used to talk to Kubernetes API
-SA_CA_CRT=$(kubectl get secret $VAULT_SA_NAME -o jsonpath="{.data['ca\.crt']}" | base64 --decode; echo)
-
-# Set K8S_HOST to minikube IP address
-K8S_HOST=$(minikube ip -p cluster-1)
-
+TOKEN_REVIEW_JWT=$(kubectl create token vault --duration=120h)
+KUBE_HOST=$(kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}')
+KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode)
 vault write -namespace=cluster-1 auth/kubernetes/config \
-    token_reviewer_jwt="$SA_JWT_TOKEN" \
-    kubernetes_host="https://$K8S_HOST:8443" \
-    kubernetes_ca_cert="$SA_CA_CRT"
+    token_reviewer_jwt="$TOKEN_REVIEW_JWT" \
+    kubernetes_host="$KUBE_HOST" \
+    kubernetes_ca_cert="$KUBE_CA_CERT"  \
+    issuer="https://kubernetes.default.svc.cluster.local"
+
+
+# to test the Token review API call.
+
+# WEBAPP=$(kubectl -n ns1 create token webapp)
+# curl -k -X "POST" "$KUBE_HOST/apis/authentication.k8s.io/v1/tokenreviews" \
+#      -H "Authorization: Bearer $TOKEN_REVIEW_JWT" \
+#      -H 'Content-Type: application/json; charset=utf-8' \
+#      -d "{
+#   \"kind\": \"TokenReview\",
+#   \"apiVersion\": \"authentication.k8s.io/v1\",
+#   \"spec\": {
+#     \"token\": \"${WEBAPP}\"	
+#     }
+# }"
